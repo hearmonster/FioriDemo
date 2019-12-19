@@ -1,0 +1,55 @@
+ID: FioriDemo
+_schema-version: '2.1'
+parameters:
+  deploy_mode: html5-repo
+version: 0.0.1
+modules:
+  - name: FioriDemo_appRouter
+    type: approuter.nodejs
+    path: FioriDemo_appRouter
+    parameters:
+      disk-quota: 256M
+      memory: 256M
+    requires:
+      - name: FioriDemo_html5_repo_runtime
+      - name: uaa_FioriDemo
+  - name: FioriDemo_ui_deployer
+    type: com.sap.html5.application-content
+    path: FioriDemo_ui_deployer
+    requires:
+      - name: FioriDemo_html5_repo_host
+    build-parameters:
+      requires:
+        - name: AppUI5
+          artifacts:
+            - './*'
+          target-path: resources/AppUI5
+  - name: AppUI5
+    type: html5
+    path: AppUI5
+    build-parameters:
+      builder: grunt
+      supported-platforms: []
+      build-result: dist
+resources:
+  - name: FioriDemo_html5_repo_runtime
+    parameters:
+      service-plan: app-runtime
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: FioriDemo_html5_repo_host
+    parameters:
+      service-plan: app-host
+      service: html5-apps-repo
+    type: org.cloudfoundry.managed-service
+  - name: uaa_FioriDemo
+    parameters:
+      path: ./xs-security.json
+      service-plan: application
+      service: xsuaa
+    type: org.cloudfoundry.managed-service
+  - name: dest_FioriDemo
+    parameters:
+      service-plan: lite
+      service: destination
+    type: org.cloudfoundry.managed-service
